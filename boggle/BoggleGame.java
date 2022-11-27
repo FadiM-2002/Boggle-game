@@ -29,6 +29,7 @@ public class BoggleGame {
             {"AAAFRS", "AAEEEE", "AAFIRS", "ADENNN", "AEEEEM", "AEEGMU", "AEGMNN", "AFIRSY",
                     "BJKQXZ", "CCNSTW", "CEIILT", "CEILPT", "CEIPST", "DDLNOR", "DDHNOT", "DHHLOR",
                     "DHLNOR", "EIIITT", "EMOTTT", "ENSSSU", "FIPRSY", "GORRVW", "HIPRRY", "NOOTUW", "OOOTTU"};
+    private Integer difficulty = 100;
 
     /**
      * BoggleGame constructor
@@ -63,6 +64,14 @@ public class BoggleGame {
     public void playGame(){
         int boardSize;
         while(true){
+            System.out.println("Choose the difficulty (1-100):");
+            String choiceDifficulty = scanner.nextLine();
+            while (!validDifficulty(choiceDifficulty)) {
+                System.out.println("Please try again");
+                System.out.println("Choose the difficulty (1-100):");
+                choiceDifficulty = scanner.nextLine();
+            }
+            difficulty = Integer.parseInt(choiceDifficulty);
             System.out.println("Enter 1 to play on a big (5x5) grid; 2 to play on a small (4x4) one:");
             String choiceGrid = scanner.nextLine();
 
@@ -123,6 +132,18 @@ public class BoggleGame {
         //we are done with the game! So, summarize all the play that has transpired and exit.
         this.gameStats.summarizeGame();
         System.out.println("Thanks for playing!");
+    }
+
+    private boolean validDifficulty(String difficulty) {
+        try {
+            if (1 <= Integer.parseInt(difficulty) && Integer.parseInt(difficulty) <= 100) {
+                return true;
+            }
+        }
+        catch (NumberFormatException e) {
+            return false;
+        }
+        return false;
     }
 
     /**
@@ -201,17 +222,17 @@ public class BoggleGame {
      * @param boggleGrid A boggle grid, with a letter at each position on the grid
      */
     private void findAllWords(Map<String,ArrayList<Position>> allWords, Dictionary boggleDict, BoggleGrid boggleGrid) {
-        for (int row = 0; row < boggleGrid.numRows(); row++) {
-            for (int col = 0; col < boggleGrid.numCols(); col++) {
-                HashMap<String, ArrayList<Position>> root = new HashMap<>();
-                ArrayList<Position> position = new ArrayList<>();
-                position.add(new Position(row, col));
-                String str = Character.toString(boggleGrid.getCharAt(row, col));
-                root.put(str, position);
-                WordSearchTree tree = new WordSearchTree(root);
-                buildTree(tree, str, position, boggleGrid, boggleDict);
-                findAllWordsHelper(allWords, tree, boggleDict);
-            }
+        GridIterator iterator = boggleGrid.getIterator();
+        while (iterator.hasNext()) {
+            HashMap<String, ArrayList<Position>> root = new HashMap<>();
+            ArrayList<Position> positions = new ArrayList<>();
+            Position position = iterator.next();
+            positions.add(position);
+            String str = Character.toString(boggleGrid.getCharAt(position.getRow(), position.getCol()));
+            root.put(str, positions);
+            WordSearchTree tree = new WordSearchTree(root);
+            buildTree(tree, str, positions, boggleGrid, boggleDict);
+            findAllWordsHelper(allWords, tree, boggleDict);
         }
     }
 
@@ -312,13 +333,17 @@ public class BoggleGame {
      * @param allWords A mutable list of all legal words that can be found, given the boggleGrid grid letters
      */
     private void computerMove(Map<String,ArrayList<Position>> allWords){
+        double difficultyRate = difficulty * 0.01;
+        int numberOfWords = (int)(difficultyRate * allWords.size());
+        int counter = 0;
         for (String word: allWords.keySet()) {
             if (!gameStats.getPlayerWords().contains(word.toUpperCase())) {
+                counter++;
                 gameStats.addWord(word.toUpperCase(), BoggleStats.Player.Computer);
             }
+            if (counter == numberOfWords) break;
         }
     }
-
 }
 
 class WordSearchTree {

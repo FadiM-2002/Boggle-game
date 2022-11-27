@@ -39,6 +39,25 @@ public class BoggleGrid {
     }
 
     /**
+     * Implements User Story 2.4 (rotate grid)
+     * Rotates a Boggle grid by 90 degrees counter-clockwise
+     * @return a Boggle grid that has been rotated
+     */
+    public BoggleGrid rotateGrid() {
+        int size = this.size;
+        BoggleGrid newGrid = new BoggleGrid(size);
+
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                int newRow = (size - 1) - col;
+                int newCol = row;
+                newGrid.board[newRow][newCol] = this.getCharAt(row, col);
+            }
+        }
+        return newGrid;
+    }
+
+    /**
      * Provide a nice-looking string representation of the grid,
      * so that the user can easily scan it for words.
      *

@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+/**
+ * Tests the methods related to user story 1.4 (copy grid)
+ */
 public class GridPrototypeTest {
 
     //Tests the clone method with a Boggle grid of size 4
@@ -81,8 +83,115 @@ public class GridPrototypeTest {
                 assertEquals(grid3.getCharAt(i, j), clonedGrid3.getCharAt(i, j));
             }
         }
+    }
+
+    //Tests the addGrid method in the GridPrototypeRegistry class
+    @Test
+    void TestAddGrid() {
+        BoggleGrid originalGrid = new BoggleGrid(4);
+        originalGrid.initalizeBoard("IseemToBeHavinga");
+        GridPrototypeRegistry gridRegistry = new GridPrototypeRegistry();
+        gridRegistry.addGrid("first saved grid!!", originalGrid);
+        assertEquals(1, gridRegistry.getSavedGridNum());
+
+        BoggleGrid grid2 = new BoggleGrid(4);
+        originalGrid.initalizeBoard("IseemToBeaaaaaaa");
+        gridRegistry.addGrid("2nd grid", grid2);
+        assertEquals(2, gridRegistry.getSavedGridNum());
+
+        BoggleGrid grid3 = new BoggleGrid(4);
+        originalGrid.initalizeBoard("IseemToBeBeBeBeB");
+        gridRegistry.addGrid("grid three", grid3);
+        assertEquals(3, gridRegistry.getSavedGridNum());
 
     }
 
+    //Tests the getGridByName method of GridPrototypeRegistry class
+    @Test
+    void TestGetGridByName() {
+        GridPrototypeRegistry gridRegistry = new GridPrototypeRegistry();
 
+        BoggleGrid grid1 = new BoggleGrid(4);
+        grid1.initalizeBoard("IseemToBeHavinga");
+        gridRegistry.addGrid("first saved grid!!", grid1);
+        assertEquals(1, gridRegistry.getSavedGridNum());
+
+        BoggleGrid grid2 = new BoggleGrid(4);
+        grid2.initalizeBoard("IseemToBeaaaaaaa");
+        gridRegistry.addGrid("2nd grid", grid2);
+        assertEquals(2, gridRegistry.getSavedGridNum());
+
+        BoggleGrid grid3 = new BoggleGrid(4);
+        grid3.initalizeBoard("IseemToBeBeBeBeB");
+        gridRegistry.addGrid("grid three", grid3);
+        assertEquals(3, gridRegistry.getSavedGridNum());
+
+
+        BoggleGrid getGrid1 = gridRegistry.getGridByName("2nd grid");
+        BoggleGrid getGrid2 = gridRegistry.getGridByName("grid three");
+        BoggleGrid getGrid3 = gridRegistry.getGridByName("first saved grid!!");
+
+        BoggleGrid expected1 = new BoggleGrid(4);
+        expected1.initalizeBoard("IseemToBeaaaaaaa");
+        BoggleGrid expected2 = new BoggleGrid(4);
+        expected2.initalizeBoard("IseemToBeBeBeBeB");
+        BoggleGrid expected3 = new BoggleGrid(4);
+        expected3.initalizeBoard("IseemToBeHavinga");
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                assertEquals(expected1.getCharAt(i, j), getGrid1.getCharAt(i, j));
+                assertEquals(expected2.getCharAt(i, j), getGrid2.getCharAt(i, j));
+                assertEquals(expected3.getCharAt(i, j), getGrid3.getCharAt(i, j));
+            }
+        }
+    }
+
+    @Test
+    void TestGetGridByName2() {
+        GridPrototypeRegistry gridRegistry = new GridPrototypeRegistry();
+
+        BoggleGrid grid1 = new BoggleGrid(5);
+        grid1.initalizeBoard("dostoevskyFyodorLeotolsto");
+        gridRegistry.addGrid("crime and war and punishment and peace", grid1);
+        assertEquals(1, gridRegistry.getSavedGridNum());
+
+        BoggleGrid grid2 = new BoggleGrid(5);
+        grid2.initalizeBoard("abcdefghijklmnopqrstuvwxy");
+        gridRegistry.addGrid("alpha", grid2);
+        assertEquals(2, gridRegistry.getSavedGridNum());
+
+        BoggleGrid grid3 = new BoggleGrid(5);
+        grid3.initalizeBoard("turgenevivangoncharovtwoo");
+        gridRegistry.addGrid("oblomov's bed", grid3);
+        assertEquals(3, gridRegistry.getSavedGridNum());
+
+        BoggleGrid grid4 = new BoggleGrid(5);
+        grid4.initalizeBoard("mrflaubertnotredamenapole");
+        gridRegistry.addGrid("bovary", grid4);
+        assertEquals(4, gridRegistry.getSavedGridNum());
+
+        BoggleGrid getGrid1 = gridRegistry.getGridByName("crime and war and punishment and peace");
+        BoggleGrid getGrid2 = gridRegistry.getGridByName("alpha");
+        BoggleGrid getGrid3 = gridRegistry.getGridByName("oblomov's bed");
+        BoggleGrid getGrid4 = gridRegistry.getGridByName("bovary");
+
+        BoggleGrid expected1 = new BoggleGrid(5);
+        expected1.initalizeBoard("dostoevskyFyodorLeotolsto");
+        BoggleGrid expected2 = new BoggleGrid(5);
+        expected2.initalizeBoard("abcdefghijklmnopqrstuvwxy");
+        BoggleGrid expected3 = new BoggleGrid(5);
+        expected3.initalizeBoard("turgenevivangoncharovtwoo");
+        BoggleGrid expected4 = new BoggleGrid(5);
+        expected4.initalizeBoard("mrflaubertnotredamenapole");
+
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                assertEquals(expected1.getCharAt(i, j), getGrid1.getCharAt(i, j));
+                assertEquals(expected2.getCharAt(i, j), getGrid2.getCharAt(i, j));
+                assertEquals(expected3.getCharAt(i, j), getGrid3.getCharAt(i, j));
+                assertEquals(expected4.getCharAt(i, j), getGrid4.getCharAt(i, j));
+            }
+        }
+    }
 }

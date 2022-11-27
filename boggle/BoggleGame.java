@@ -165,7 +165,7 @@ public class BoggleGame {
         findAllWords(allWords, boggleDict, grid);
         //step 4. allow the user to try to find some words on the grid
         humanMove(grid, allWords);
-        //step 5. allow the computer to identify remaining words
+        //either allows a second user to try to find words or allows the computer to identify remaining words
         gameMode.opMove(grid, allWords, gameStats);
     }
 

@@ -222,7 +222,7 @@ public class BoggleGame {
      * @param boggleGrid A boggle grid, with a letter at each position on the grid
      */
     private void findAllWords(Map<String,ArrayList<Position>> allWords, Dictionary boggleDict, BoggleGrid boggleGrid) {
-        GridIterator iterator = boggleGrid.getIterator();
+        GridIterator iterator = boggleGrid.getIterator(); // Get the iterator to iterate over the grid
         while (iterator.hasNext()) {
             HashMap<String, ArrayList<Position>> root = new HashMap<>();
             ArrayList<Position> positions = new ArrayList<>();

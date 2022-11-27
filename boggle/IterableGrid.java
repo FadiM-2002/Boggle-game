@@ -1,7 +1,6 @@
 package boggle;
 
-import boggle.GridIterator;
-
+// an interface of an iterable boggle grid
 public interface IterableGrid {
     public GridIterator getIterator();
 }

@@ -77,6 +77,7 @@ public class BoggleGrid implements IterableGrid{
         return this.board[row][col];
     }
 
+    // returns the iterator that will be used to iterate over the grid
     @Override
     public GridIterator getIterator() {
         return new BoggleIterator(board);

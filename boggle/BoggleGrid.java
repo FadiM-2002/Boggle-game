@@ -4,7 +4,7 @@ package boggle;
  * The BoggleGrid class for the first Assignment in CSC207, Fall 2022
  * The BoggleGrid represents the grid on which we play Boggle 
  */
-public class BoggleGrid implements GridPrototype{
+public class BoggleGrid implements GridPrototype, IterableGrid{
 
     /**
      * size of grid
@@ -101,4 +101,9 @@ public class BoggleGrid implements GridPrototype{
         return this.board[row][col];
     }
 
+    // returns the iterator that will be used to iterate over the grid
+    @Override
+    public GridIterator getIterator() {
+        return new BoggleIterator(board);
+    }
 }

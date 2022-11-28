@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Testing the rotateGrid method which implement the user story 'rotate grid'
+ */
 class RotateGridTest {
 
     //Testing rotateGrid method with grid of size 4

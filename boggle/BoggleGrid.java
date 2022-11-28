@@ -39,7 +39,7 @@ public class BoggleGrid {
     }
 
     /**
-     * Implements User Story 2.4 (rotate grid)
+     * Implements User Story 'rotate grid'
      * Rotates a Boggle grid by 90 degrees counter-clockwise
      * @return a Boggle grid that has been rotated
      */

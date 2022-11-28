@@ -15,7 +15,7 @@ class BoggleIteratorTest {
         Method method = game.getClass().getDeclaredMethod("findAllWords", Map.class, Dictionary.class, BoggleGrid.class);
         method.setAccessible(true);
 
-        Dictionary boggleDict = new Dictionary("wordlist.txt");
+        Dictionary boggleDict = new Dictionary("Boggle-game/wordlist.txt");
         Map<String, ArrayList<Position>> allWords = new HashMap<>();
         BoggleGrid grid = new BoggleGrid(4);
         grid.initalizeBoard("RHLDNHTGIPHSNMJO");

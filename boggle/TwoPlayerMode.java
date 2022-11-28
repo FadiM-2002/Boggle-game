@@ -16,6 +16,7 @@ public class TwoPlayerMode implements BoggleGameMode{
      * @param board The boggle board
      * @param allWords A mutable list of all legal words that can be found, given the boggleGrid grid letters
      * @param gameStats Stores game statistics
+     * @param difficulty A difficulty level indicated by the user
      */
     @Override
     public void opMove(BoggleGrid board, Map<String, ArrayList<Position>> allWords, BoggleStats gameStats,

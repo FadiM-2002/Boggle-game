@@ -33,6 +33,7 @@ public class BoggleGame {
             {"AAAFRS", "AAEEEE", "AAFIRS", "ADENNN", "AEEEEM", "AEEGMU", "AEGMNN", "AFIRSY",
                     "BJKQXZ", "CCNSTW", "CEIILT", "CEILPT", "CEIPST", "DDLNOR", "DDHNOT", "DHHLOR",
                     "DHLNOR", "EIIITT", "EMOTTT", "ENSSSU", "FIPRSY", "GORRVW", "HIPRRY", "NOOTUW", "OOOTTU"};
+    private Integer difficulty = 100;
 
     /**
      * BoggleGame constructor
@@ -48,7 +49,8 @@ public class BoggleGame {
     public void giveInstructions()
     {
         System.out.println("The Boggle board contains a grid of letters that are randomly placed.");
-        System.out.println("If you are playing with me (the computer), we're both going to try to find words in this grid by joining the letters.");
+        System.out.println("If you are playing with me (the computer), we're both going to try to");
+        System.out.println("find words in this grid by joining the letters.");
         System.out.println("You can form a word by connecting adjoining letters on the grid.");
         System.out.println("Two letters adjoin if they are next to each other horizontally, ");
         System.out.println("vertically, or diagonally. The words you find must be at least 4 letters long, ");
@@ -56,7 +58,8 @@ public class BoggleGame {
         System.out.println("will be based on word length: a 4-letter word is worth 1 point, 5-letter");
         System.out.println("words earn 2 points, and so on. After you find as many words as you can,");
         System.out.println("I will find all the remaining words.");
-        System.out.println("The game will be very similar if you are playing with a friend, except your friend will be finding the remaining words.");
+        System.out.println("The game will be very similar if you are playing with a friend, except that");
+        System.out.println("your friend will be finding the remaining words.");
         System.out.println("\nHit return when you're ready...");
     }
 
@@ -68,6 +71,14 @@ public class BoggleGame {
     public void playGame(){
         int boardSize;
         while(true){
+            System.out.println("Choose the difficulty (1-100). This will apply if you play the computer:");
+            String choiceDifficulty = scanner.nextLine();
+            while (!validDifficulty(choiceDifficulty)) {
+                System.out.println("Please try again");
+                System.out.println("Choose the difficulty (1-100). This will apply if you play the computer:");
+                choiceDifficulty = scanner.nextLine();
+            }
+            difficulty = Integer.parseInt(choiceDifficulty);
             System.out.println("Enter 1 to play on a big (5x5) grid; 2 to play on a small (4x4) one:");
             String choiceGrid = scanner.nextLine();
 
@@ -148,6 +159,18 @@ public class BoggleGame {
         System.out.println("Thanks for playing!");
     }
 
+    private boolean validDifficulty(String difficulty) {
+        try {
+            if (1 <= Integer.parseInt(difficulty) && Integer.parseInt(difficulty) <= 100) {
+                return true;
+            }
+        }
+        catch (NumberFormatException e) {
+            return false;
+        }
+        return false;
+    }
+
     /**
      * Play a round of Boggle.
      * This initializes the main objects: the board, the dictionary, the map of all
@@ -166,7 +189,7 @@ public class BoggleGame {
         //step 4. allow the user to try to find some words on the grid
         humanMove(grid, allWords);
         //either allows a second user to try to find words or allows the computer to identify remaining words
-        gameMode.opMove(grid, allWords, gameStats);
+        gameMode.opMove(grid, allWords, gameStats, difficulty);
     }
 
     /**
@@ -231,17 +254,17 @@ public class BoggleGame {
      * @param boggleGrid A boggle grid, with a letter at each position on the grid
      */
     private void findAllWords(Map<String,ArrayList<Position>> allWords, Dictionary boggleDict, BoggleGrid boggleGrid) {
-        for (int row = 0; row < boggleGrid.numRows(); row++) {
-            for (int col = 0; col < boggleGrid.numCols(); col++) {
-                HashMap<String, ArrayList<Position>> root = new HashMap<>();
-                ArrayList<Position> position = new ArrayList<>();
-                position.add(new Position(row, col));
-                String str = Character.toString(boggleGrid.getCharAt(row, col));
-                root.put(str, position);
-                WordSearchTree tree = new WordSearchTree(root);
-                buildTree(tree, str, position, boggleGrid, boggleDict);
-                findAllWordsHelper(allWords, tree, boggleDict);
-            }
+        GridIterator iterator = boggleGrid.getIterator(); // Get the iterator to iterate over the grid
+        while (iterator.hasNext()) {
+            HashMap<String, ArrayList<Position>> root = new HashMap<>();
+            ArrayList<Position> positions = new ArrayList<>();
+            Position position = iterator.next();
+            positions.add(position);
+            String str = Character.toString(boggleGrid.getCharAt(position.getRow(), position.getCol()));
+            root.put(str, positions);
+            WordSearchTree tree = new WordSearchTree(root);
+            buildTree(tree, str, positions, boggleGrid, boggleDict);
+            findAllWordsHelper(allWords, tree, boggleDict);
         }
     }
 
@@ -336,7 +359,6 @@ public class BoggleGame {
             }
         }
     }
-
 }
 
 class WordSearchTree {

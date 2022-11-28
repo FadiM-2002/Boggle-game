@@ -17,6 +17,6 @@ public interface BoggleGameMode {
      * @param allWords A mutable list of all legal words that can be found, given the boggleGrid grid letters
      * @param gameStats Stores game statistics
      */
-    void opMove(BoggleGrid board, Map<String,ArrayList<Position>> allWords, BoggleStats gameStats);
+    void opMove(BoggleGrid board, Map<String,ArrayList<Position>> allWords, BoggleStats gameStats, Integer difficulty);
 
 }

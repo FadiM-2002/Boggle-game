@@ -10,15 +10,16 @@ import java.util.Scanner;
 public class TwoPlayerMode implements BoggleGameMode{
 
     /**
-     * gets words from the computer, which will be valid words that are not already in the player's word list. These
-     * words are added to the computer's word list and their score is incremented (in boggleStats).
+     * gets words from a second user. If a word is valid and not already in the first user's word list, then it is
+     * added to this user's word list and their score is incremented (in boggleStats).
      *
      * @param board The boggle board
      * @param allWords A mutable list of all legal words that can be found, given the boggleGrid grid letters
      * @param gameStats Stores game statistics
      */
     @Override
-    public void opMove(BoggleGrid board, Map<String, ArrayList<Position>> allWords, BoggleStats gameStats) {
+    public void opMove(BoggleGrid board, Map<String, ArrayList<Position>> allWords, BoggleStats gameStats,
+                       Integer difficulty) {
         System.out.println("It's P2's turn to find some words!");
         System.out.println(board);
         Scanner scanner = new Scanner(System.in);

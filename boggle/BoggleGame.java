@@ -291,6 +291,26 @@ public class BoggleGame {
     private void humanMove(BoggleGrid board, Map<String,ArrayList<Position>> allWords){
         System.out.println("It's your turn to find some words!");
         System.out.println(board);
+
+        //asking the user if they want to rotate the grid (user story 2.4)
+        boolean rotateGrid = true;
+        BoggleGrid currentGrid = board;
+        while (rotateGrid) {
+            System.out.println("Do you want to rotate the grid? (yes/no)");
+            String rotateGridChoice = scanner.nextLine();
+            if (rotateGridChoice.equalsIgnoreCase("yes")) {
+                currentGrid = currentGrid.rotateGrid();
+                System.out.println(currentGrid);
+            }
+            else if (rotateGridChoice.equalsIgnoreCase("no")){
+                rotateGrid = false;
+                System.out.println("\nEnter the words you have found:");
+            }
+            else {
+                System.out.println("Invalid input. Please answer by \"yes\" or \"no\".");
+            }
+        }
+
         while(true) {
             String input = scanner.nextLine();
             if (input.equals("")) break;

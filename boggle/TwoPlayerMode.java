@@ -20,18 +20,41 @@ public class TwoPlayerMode implements BoggleGameMode{
      */
     @Override
     public void opMove(BoggleGrid board, Map<String, ArrayList<Position>> allWords, BoggleStats gameStats,
-                       Integer difficulty) {
+                       Integer difficulty, Integer timeLimit) {
         System.out.println("It's P2's turn to find some words!");
         System.out.println(board);
         Scanner scanner = new Scanner(System.in);
-        while(true) {
-            String input = scanner.nextLine();
-            if (input.equals("")) break;
-            for (String word: allWords.keySet()) {
-                if (!gameStats.getPlayerWords().contains(word.toUpperCase()) && word.equalsIgnoreCase(input)) {
-                    gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Computer);
+
+        //checks whether user has selected to use a time limit and either runs a game without the timer or with the timer
+        boolean timed = (timeLimit != 0);
+        if (!timed) {
+            while(true) {
+                String input = scanner.nextLine();
+                if (input.equals("")) break;
+                for (String word: allWords.keySet()) {
+                    if (!gameStats.getPlayerWords().contains(word.toUpperCase()) && word.equalsIgnoreCase(input)) {
+                        gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Computer);
+                    }
                 }
             }
         }
+        else {
+            BackgroundTimer timer = new BackgroundTimer(timeLimit);
+            timer.start();
+            while(true) {
+                String input = scanner.nextLine();
+                if (!timer.isAlive()) break;
+                if (input.equals("")) break;
+                for (String word: allWords.keySet()) {
+                    if (!gameStats.getPlayerWords().contains(word.toUpperCase()) && word.equalsIgnoreCase(input)) {
+                        gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Computer);
+                    }
+                }
+            }
+            if (timer.isAlive()) {
+                timer.stop();
+            }
+        }
+
     }
 }

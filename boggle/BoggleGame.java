@@ -19,6 +19,10 @@ public class BoggleGame {
      * facilitates opponent behavior during game rounds
      */
     private BoggleGameMode gameMode;
+    /**
+     * the time limit imposed on each human player for each round
+     */
+    private Integer timeLimit;
 
     /**
      * dice used to randomize letter assignments for a small grid
@@ -111,6 +115,29 @@ public class BoggleGame {
                 setGameMode(new SinglePlayerMode());
             }
 
+            //get timer preference
+            System.out.println("Enter 1 to play with no time limit; 2 to play with a 30 second time limit; 3 to play");
+            System.out.println("with a 60 second time limit:");
+            String choiceTime = scanner.nextLine();
+
+            if (choiceTime == "") break;
+            while(!choiceTime.equals("1") && !choiceTime.equals("2") && !choiceTime.equals("3")) {
+                System.out.println("Please try again.");
+                System.out.println("Enter 1 to play with no time limit; 2 to play with a 30 second time limit; 3 to play");
+                System.out.println("with a 60 second time limit:");
+                choiceTime = scanner.nextLine();
+            }
+
+            if (choiceTime.equals("1")) {
+                timeLimit = 0;
+            }
+            else if (choiceTime.equals("2")) {
+                timeLimit = 30;
+            }
+            else {
+                timeLimit = 60;
+            }
+
             //get letter choice preference
             System.out.println("Enter 1 to randomly assign letters to the grid; 2 to provide your own.");
             String choiceLetters = scanner.nextLine();
@@ -189,7 +216,7 @@ public class BoggleGame {
         //step 4. allow the user to try to find some words on the grid
         humanMove(grid, allWords);
         //either allows a second user to try to find words or allows the computer to identify remaining words
-        gameMode.opMove(grid, allWords, gameStats, difficulty);
+        gameMode.opMove(grid, allWords, gameStats, difficulty, timeLimit);
     }
 
     /**
@@ -349,13 +376,35 @@ public class BoggleGame {
             System.out.println("It's P1's turn to find some words!");
         }
         System.out.println(board);
-        while(true) {
-            String input = scanner.nextLine();
-            if (input.equals("")) break;
-            for (String word: allWords.keySet()) {
-                if (word.equalsIgnoreCase(input)) {
-                    gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Human);
+
+        //checks whether user has selected to use a time limit and either runs a game without the timer or with the timer
+        boolean timed = (timeLimit != 0);
+        if (!timed) {
+            while(true) {
+                String input = scanner.nextLine();
+                if (input.equals("")) break;
+                for (String word: allWords.keySet()) {
+                    if (word.equalsIgnoreCase(input)) {
+                        gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Human);
+                    }
                 }
+            }
+        }
+        else {
+            BackgroundTimer timer = new BackgroundTimer(timeLimit);
+            timer.start();
+            while(true) {
+                String input = scanner.nextLine();
+                if (!timer.isAlive()) break;
+                if (input.equals("")) break;
+                for (String word: allWords.keySet()) {
+                    if (word.equalsIgnoreCase(input)) {
+                        gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Human);
+                    }
+                }
+            }
+            if (timer.isAlive()) {
+                timer.stop();
             }
         }
     }

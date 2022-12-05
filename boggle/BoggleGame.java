@@ -10,11 +10,19 @@ public class BoggleGame {
     /**
      * scanner used to interact with the user via console
      */ 
-    public Scanner scanner; 
+    public Scanner scanner;
     /**
      * stores game statistics
      */ 
     private BoggleStats gameStats;
+    /**
+     * facilitates opponent behavior during game rounds
+     */
+    private BoggleGameMode gameMode;
+    /**
+     * the time limit imposed on each human player for each round
+     */
+    private Integer timeLimit;
 
     /**
      * dice used to randomize letter assignments for a small grid
@@ -29,6 +37,7 @@ public class BoggleGame {
             {"AAAFRS", "AAEEEE", "AAFIRS", "ADENNN", "AEEEEM", "AEEGMU", "AEGMNN", "AFIRSY",
                     "BJKQXZ", "CCNSTW", "CEIILT", "CEILPT", "CEIPST", "DDLNOR", "DDHNOT", "DHHLOR",
                     "DHLNOR", "EIIITT", "EMOTTT", "ENSSSU", "FIPRSY", "GORRVW", "HIPRRY", "NOOTUW", "OOOTTU"};
+    private Integer difficulty = 100;
 
     /**
      * BoggleGame constructor
@@ -44,7 +53,8 @@ public class BoggleGame {
     public void giveInstructions()
     {
         System.out.println("The Boggle board contains a grid of letters that are randomly placed.");
-        System.out.println("We're both going to try to find words in this grid by joining the letters.");
+        System.out.println("If you are playing with me (the computer), we're both going to try to");
+        System.out.println("find words in this grid by joining the letters.");
         System.out.println("You can form a word by connecting adjoining letters on the grid.");
         System.out.println("Two letters adjoin if they are next to each other horizontally, ");
         System.out.println("vertically, or diagonally. The words you find must be at least 4 letters long, ");
@@ -52,6 +62,8 @@ public class BoggleGame {
         System.out.println("will be based on word length: a 4-letter word is worth 1 point, 5-letter");
         System.out.println("words earn 2 points, and so on. After you find as many words as you can,");
         System.out.println("I will find all the remaining words.");
+        System.out.println("The game will be very similar if you are playing with a friend, except that");
+        System.out.println("your friend will be finding the remaining words.");
         System.out.println("\nHit return when you're ready...");
     }
 
@@ -63,6 +75,14 @@ public class BoggleGame {
     public void playGame(){
         int boardSize;
         while(true){
+            System.out.println("Choose the difficulty (1-100). This will apply if you play the computer:");
+            String choiceDifficulty = scanner.nextLine();
+            while (!validDifficulty(choiceDifficulty)) {
+                System.out.println("Please try again");
+                System.out.println("Choose the difficulty (1-100). This will apply if you play the computer:");
+                choiceDifficulty = scanner.nextLine();
+            }
+            difficulty = Integer.parseInt(choiceDifficulty);
             System.out.println("Enter 1 to play on a big (5x5) grid; 2 to play on a small (4x4) one:");
             String choiceGrid = scanner.nextLine();
 
@@ -76,6 +96,47 @@ public class BoggleGame {
 
             if(choiceGrid.equals("1")) boardSize = 5;
             else boardSize = 4;
+
+            //get game mode preference
+            System.out.println("Enter 1 to play with a friend; 2 to play with the computer:");
+            String choiceMode = scanner.nextLine();
+
+            if (choiceMode == "") break;
+            while(!choiceMode.equals("1") && !choiceMode.equals("2")){
+                System.out.println("Please try again.");
+                System.out.println("Enter 1 to play with a friend; 2 to play with the computer:");
+                choiceMode = scanner.nextLine();
+            }
+
+            if (choiceMode.equals("1")) {
+                setGameMode(new TwoPlayerMode());
+            }
+            else {
+                setGameMode(new SinglePlayerMode());
+            }
+
+            //get timer preference
+            System.out.println("Enter 1 to play with no time limit; 2 to play with a 30 second time limit; 3 to play");
+            System.out.println("with a 60 second time limit:");
+            String choiceTime = scanner.nextLine();
+
+            if (choiceTime == "") break;
+            while(!choiceTime.equals("1") && !choiceTime.equals("2") && !choiceTime.equals("3")) {
+                System.out.println("Please try again.");
+                System.out.println("Enter 1 to play with no time limit; 2 to play with a 30 second time limit; 3 to play");
+                System.out.println("with a 60 second time limit:");
+                choiceTime = scanner.nextLine();
+            }
+
+            if (choiceTime.equals("1")) {
+                timeLimit = 0;
+            }
+            else if (choiceTime.equals("2")) {
+                timeLimit = 30;
+            }
+            else {
+                timeLimit = 60;
+            }
 
             //get letter choice preference
             System.out.println("Enter 1 to randomly assign letters to the grid; 2 to provide your own.");
@@ -125,6 +186,18 @@ public class BoggleGame {
         System.out.println("Thanks for playing!");
     }
 
+    private boolean validDifficulty(String difficulty) {
+        try {
+            if (1 <= Integer.parseInt(difficulty) && Integer.parseInt(difficulty) <= 100) {
+                return true;
+            }
+        }
+        catch (NumberFormatException e) {
+            return false;
+        }
+        return false;
+    }
+
     /**
      * Play a round of Boggle.
      * This initializes the main objects: the board, the dictionary, the map of all
@@ -136,14 +209,21 @@ public class BoggleGame {
         BoggleGrid grid = new BoggleGrid(size);
         grid.initalizeBoard(letters);
         //step 2. initialize the dictionary of legal words
-        Dictionary boggleDict = new Dictionary("wordlist.txt"); //you may have to change the path to the wordlist, depending on where you place it.
+        Dictionary boggleDict = new Dictionary("Boggle-game/wordlist.txt"); //you may have to change the path to the wordlist, depending on where you place it.
         //step 3. find all legal words on the board, given the dictionary and grid arrangement.
         Map<String, ArrayList<Position>> allWords = new HashMap<String, ArrayList<Position>>();
         findAllWords(allWords, boggleDict, grid);
         //step 4. allow the user to try to find some words on the grid
         humanMove(grid, allWords);
-        //step 5. allow the computer to identify remaining words
-        computerMove(allWords);
+        //either allows a second user to try to find words or allows the computer to identify remaining words
+        gameMode.opMove(grid, allWords, gameStats, difficulty, timeLimit);
+    }
+
+    /**
+     * Setter for gameMode attribute
+     */
+    private void setGameMode(BoggleGameMode gameMode) {
+        this.gameMode = gameMode;
     }
 
     /**
@@ -201,17 +281,17 @@ public class BoggleGame {
      * @param boggleGrid A boggle grid, with a letter at each position on the grid
      */
     private void findAllWords(Map<String,ArrayList<Position>> allWords, Dictionary boggleDict, BoggleGrid boggleGrid) {
-        for (int row = 0; row < boggleGrid.numRows(); row++) {
-            for (int col = 0; col < boggleGrid.numCols(); col++) {
-                HashMap<String, ArrayList<Position>> root = new HashMap<>();
-                ArrayList<Position> position = new ArrayList<>();
-                position.add(new Position(row, col));
-                String str = Character.toString(boggleGrid.getCharAt(row, col));
-                root.put(str, position);
-                WordSearchTree tree = new WordSearchTree(root);
-                buildTree(tree, str, position, boggleGrid, boggleDict);
-                findAllWordsHelper(allWords, tree, boggleDict);
-            }
+        GridIterator iterator = boggleGrid.getIterator(); // Get the iterator to iterate over the grid
+        while (iterator.hasNext()) {
+            HashMap<String, ArrayList<Position>> root = new HashMap<>();
+            ArrayList<Position> positions = new ArrayList<>();
+            Position position = iterator.next();
+            positions.add(position);
+            String str = Character.toString(boggleGrid.getCharAt(position.getRow(), position.getCol()));
+            root.put(str, positions);
+            WordSearchTree tree = new WordSearchTree(root);
+            buildTree(tree, str, positions, boggleGrid, boggleDict);
+            findAllWordsHelper(allWords, tree, boggleDict);
         }
     }
 
@@ -289,7 +369,12 @@ public class BoggleGame {
      * @param allWords A mutable list of all legal words that can be found, given the boggleGrid grid letters
      */
     private void humanMove(BoggleGrid board, Map<String,ArrayList<Position>> allWords){
-        System.out.println("It's your turn to find some words!");
+        if (gameMode.getClass() == SinglePlayerMode.class) {
+            System.out.println("It's your turn to find some words!");
+        }
+        else {
+            System.out.println("It's P1's turn to find some words!");
+        }
         System.out.println(board);
 
         //asking the user if they want to rotate the grid (user story 2.4)
@@ -311,34 +396,37 @@ public class BoggleGame {
             }
         }
 
-        while(true) {
-            String input = scanner.nextLine();
-            if (input.equals("")) break;
-            for (String word: allWords.keySet()) {
-                if (word.equalsIgnoreCase(input)) {
-                    gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Human);
+        //checks whether user has selected to use a time limit and either runs a game without the timer or with the timer
+        boolean timed = (timeLimit != 0);
+        if (!timed) {
+            while(true) {
+                String input = scanner.nextLine();
+                if (input.equals("")) break;
+                for (String word: allWords.keySet()) {
+                    if (word.equalsIgnoreCase(input)) {
+                        gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Human);
+                    }
                 }
             }
         }
-    }
-
-
-    /**
-     * Gets words from the computer.  The computer should find words that are
-     * both valid and not in the player's word list.  For each word that the computer
-     * finds, update the computer's word list and increment the
-     * computer's score (stored in boggleStats).
-     *
-     * @param allWords A mutable list of all legal words that can be found, given the boggleGrid grid letters
-     */
-    private void computerMove(Map<String,ArrayList<Position>> allWords){
-        for (String word: allWords.keySet()) {
-            if (!gameStats.getPlayerWords().contains(word.toUpperCase())) {
-                gameStats.addWord(word.toUpperCase(), BoggleStats.Player.Computer);
+        else {
+            BackgroundTimer timer = new BackgroundTimer(timeLimit);
+            timer.start();
+            while(true) {
+                String input = scanner.nextLine();
+                if (!timer.isAlive()) break;
+                if (input.equals("")) break;
+                for (String word: allWords.keySet()) {
+                    if (word.equalsIgnoreCase(input)) {
+                        gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Human);
+                    }
+                }
+            }
+            if (timer.isAlive()) {
+                timer.stop();
             }
         }
     }
-
 }
 
 class WordSearchTree {

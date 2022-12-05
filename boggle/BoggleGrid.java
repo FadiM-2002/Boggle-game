@@ -4,7 +4,7 @@ package boggle;
  * The BoggleGrid class for the first Assignment in CSC207, Fall 2022
  * The BoggleGrid represents the grid on which we play Boggle 
  */
-public class BoggleGrid {
+public class BoggleGrid implements GridPrototype, IterableGrid{
 
     /**
      * size of grid
@@ -15,6 +15,7 @@ public class BoggleGrid {
      */      
     private char[][] board;
 
+
     /** BoggleGrid constructor
      * ----------------------
      * @param size  The size of the Boggle grid to initialize
@@ -22,6 +23,29 @@ public class BoggleGrid {
     public BoggleGrid(int size) {
         this.size = size;
         this.board = new char[size][size];
+    }
+
+    /** BoggleGrid constructor
+     * ----------------------
+     * @param targetGrid  The Boggle grid to clone and then initialize
+     */
+    public BoggleGrid(BoggleGrid targetGrid) {
+        this.size = targetGrid.numCols();
+        this.board = new char[this.size][this.size];
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                this.board[i][j] = targetGrid.getCharAt(i, j);
+            }
+        }
+    }
+
+    /**
+     * Creates a clone of the targetGrid
+     * @return a BoggleGrid which is a clone of targetGrid
+     */
+    @Override
+    public BoggleGrid clone() {
+        return new BoggleGrid(this);
     }
 
     /**
@@ -96,4 +120,9 @@ public class BoggleGrid {
         return this.board[row][col];
     }
 
+    // returns the iterator that will be used to iterate over the grid
+    @Override
+    public GridIterator getIterator() {
+        return new BoggleIterator(board);
+    }
 }

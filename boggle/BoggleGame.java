@@ -36,6 +36,11 @@ public class BoggleGame {
     private Integer difficulty = 100;
 
     /**
+     * registry used to store boards that the user chooses to save
+     */
+    private GridPrototypeRegistry gridRegistry = new GridPrototypeRegistry();
+
+    /**
      * BoggleGame constructor
      */
     public BoggleGame() {
@@ -111,20 +116,44 @@ public class BoggleGame {
                 setGameMode(new SinglePlayerMode());
             }
 
+            //checking if there are any saved grids or not (user story 2.5-ask-user-for-saving-board)
+            String choiceLetters;
+            boolean savedGridExist;
+            if (gridRegistry.getSavedGridNum() > 0) {
+                savedGridExist = true;
+                System.out.println("There exist saved grids.");
+                System.out.println("Enter 1 to randomly assign letters to the grid; 2 to provide your own; 3 to play with a saved grid.");
+            }
+            else {
+                savedGridExist = false;
+                System.out.println("There is no saved grid at the moment.");
+                System.out.println("You can play by randomly assigning letters to the grid or by providing your own grid");
+                System.out.println("Enter 1 to randomly assign letters to the grid; 2 to provide your own.");
+            }
+
             //get letter choice preference
-            System.out.println("Enter 1 to randomly assign letters to the grid; 2 to provide your own.");
-            String choiceLetters = scanner.nextLine();
+            choiceLetters = scanner.nextLine();
 
             if(choiceLetters == "") break; //end game if user inputs nothing
-            while(!choiceLetters.equals("1") && !choiceLetters.equals("2")){
-                System.out.println("Please try again.");
-                System.out.println("Enter 1 to randomly assign letters to the grid; 2 to provide your own.");
-                choiceLetters = scanner.nextLine();
+
+            if (savedGridExist) { //if user can use saved grids
+                while(!choiceLetters.equals("1") && !choiceLetters.equals("2") && !choiceLetters.equals("3")){
+                    System.out.println("Please try again.");
+                    System.out.println("Enter 1 to randomly assign letters to the grid; 2 to provide your own; 3 to play with a saved grid.");
+                    choiceLetters = scanner.nextLine();
+                }
+            }
+            else { //if user cannot use saved grids (no saved grids)
+                while(!choiceLetters.equals("1") && !choiceLetters.equals("2")){
+                    System.out.println("Please try again.");
+                    System.out.println("Enter 1 to randomly assign letters to the grid; 2 to provide your own.");
+                    choiceLetters = scanner.nextLine();
+                }
             }
 
             if(choiceLetters.equals("1")){
                 playRound(boardSize,randomizeLetters(boardSize));
-            } else {
+            } else if (choiceLetters.equals("2")){
                 System.out.println("Input a list of " + boardSize*boardSize + " letters:");
                 choiceLetters = scanner.nextLine();
                 while(!(choiceLetters.length() == boardSize*boardSize)){
@@ -133,6 +162,27 @@ public class BoggleGame {
                     choiceLetters = scanner.nextLine();
                 }
                 playRound(boardSize,choiceLetters.toUpperCase());
+            }
+            else { //if choiceLetters is 3
+                this.gridRegistry.printAllSavedGrids();
+                System.out.println("Enter the name of the saved grid to play with.");
+                String savedGridName = scanner.nextLine();
+                while (!this.gridRegistry.gridNameExists(savedGridName)) {
+                    System.out.println("The grid \"" + savedGridName + "\" does not exist.");
+                    System.out.println("Please try again by choosing a grid name from the list below.");
+                    this.gridRegistry.printAllSavedGrids();
+                    System.out.println("Enter the name of the saved grid to play with.");
+                    savedGridName = scanner.nextLine();
+                }
+                BoggleGrid selectedSavedGrid = this.gridRegistry.getGridByName(savedGridName);
+                int gridSize = selectedSavedGrid.numCols();
+                StringBuilder selectedGridString = new StringBuilder();
+                for (int row = 0; row < gridSize; row++) {
+                    for (int col = 0; col < gridSize; col++) {
+                        selectedGridString.append(selectedSavedGrid.getCharAt(row, col));
+                    }
+                }
+                playRound(selectedSavedGrid.numCols(), selectedGridString.toString());
             }
 
             //round is over! So, store the statistics, and end the round.
@@ -349,6 +399,32 @@ public class BoggleGame {
             System.out.println("It's P1's turn to find some words!");
         }
         System.out.println(board);
+
+        //asking the user if they want to save the current board later use, user story 1.4 (copy grid)
+        System.out.println("Do you want to save current board for later play? (yes/no)");
+        String gridSaveUserChoice = scanner.nextLine();
+        while (!gridSaveUserChoice.equalsIgnoreCase("yes") && !gridSaveUserChoice.equalsIgnoreCase("no")) {
+            System.out.println("Invalid input. Please answer by \"yes\" or \"no\".");
+            System.out.println("Do you want to save current board for later play? (yes/no)");
+            gridSaveUserChoice = scanner.nextLine();
+        }
+        if (gridSaveUserChoice.equalsIgnoreCase("yes")) { //saves the board if the user wants to
+            System.out.println("Create a name for the board to save:");
+            String boardNameToSave = scanner.nextLine();
+            while (boardNameToSave.trim().length() == 0) {
+                System.out.println("Invalid input. A board name cannot consist of only whitespaces.");
+                System.out.println("Create a name for the board to save:");
+                boardNameToSave = scanner.nextLine();
+            }
+            while (this.gridRegistry.gridNameExists(boardNameToSave)) {
+                System.out.println("A grid with the name \"" + boardNameToSave + "\" already exists.");
+                System.out.println("Please enter a new name: ");
+                boardNameToSave = scanner.nextLine();
+            }
+            this.gridRegistry.addGrid(boardNameToSave, board);
+            System.out.println("Saved the board: " + boardNameToSave);
+        }
+
         while(true) {
             String input = scanner.nextLine();
             if (input.equals("")) break;

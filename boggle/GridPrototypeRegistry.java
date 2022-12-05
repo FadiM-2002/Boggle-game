@@ -40,4 +40,13 @@ public class GridPrototypeRegistry {
     public boolean gridNameExists(String gridName) {
         return this.registry.containsKey(gridName);
     }
+
+
+    public void printAllSavedGrids() {
+        System.out.println("List of saved grids: ");
+        for (String gridName : registry.keySet()) {
+            System.out.println(gridName);
+        }
+        System.out.println("\n\n");
+    }
 }

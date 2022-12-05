@@ -17,7 +17,9 @@ public interface BoggleGameMode {
      * @param allWords A mutable list of all legal words that can be found, given the boggleGrid grid letters
      * @param gameStats Stores game statistics
      * @param difficulty A difficulty level indicated by the user
+     * @param timeLimit The time limit imposed on each human player for each round
      */
-    void opMove(BoggleGrid board, Map<String,ArrayList<Position>> allWords, BoggleStats gameStats, Integer difficulty);
+    void opMove(BoggleGrid board, Map<String,ArrayList<Position>> allWords, BoggleStats gameStats, Integer difficulty,
+                Integer timeLimit);
 
 }

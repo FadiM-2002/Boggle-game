@@ -19,6 +19,10 @@ public class BoggleGame {
      * facilitates opponent behavior during game rounds
      */
     private BoggleGameMode gameMode;
+    /**
+     * the time limit imposed on each human player for each round
+     */
+    private Integer timeLimit;
 
     /**
      * dice used to randomize letter assignments for a small grid
@@ -114,6 +118,29 @@ public class BoggleGame {
             }
             else {
                 setGameMode(new SinglePlayerMode());
+            }
+
+            //get timer preference
+            System.out.println("Enter 1 to play with no time limit; 2 to play with a 30 second time limit; 3 to play");
+            System.out.println("with a 60 second time limit:");
+            String choiceTime = scanner.nextLine();
+
+            if (choiceTime == "") break;
+            while(!choiceTime.equals("1") && !choiceTime.equals("2") && !choiceTime.equals("3")) {
+                System.out.println("Please try again.");
+                System.out.println("Enter 1 to play with no time limit; 2 to play with a 30 second time limit; 3 to play");
+                System.out.println("with a 60 second time limit:");
+                choiceTime = scanner.nextLine();
+            }
+
+            if (choiceTime.equals("1")) {
+                timeLimit = 0;
+            }
+            else if (choiceTime.equals("2")) {
+                timeLimit = 30;
+            }
+            else {
+                timeLimit = 60;
             }
 
             //checking if there are any saved grids or not (user story 2.5-ask-user-for-saving-board)
@@ -239,7 +266,7 @@ public class BoggleGame {
         //step 4. allow the user to try to find some words on the grid
         humanMove(grid, allWords);
         //either allows a second user to try to find words or allows the computer to identify remaining words
-        gameMode.opMove(grid, allWords, gameStats, difficulty);
+        gameMode.opMove(grid, allWords, gameStats, difficulty, timeLimit);
     }
 
     /**
@@ -400,7 +427,8 @@ public class BoggleGame {
         }
         System.out.println(board);
 
-        //asking the user if they want to save the current board later use, user story 1.4 (copy grid)
+
+        //asking the user if they want to save the current board later use, user story 2.5
         System.out.println("Do you want to save current board for later play? (yes/no)");
         String gridSaveUserChoice = scanner.nextLine();
         while (!gridSaveUserChoice.equalsIgnoreCase("yes") && !gridSaveUserChoice.equalsIgnoreCase("no")) {
@@ -425,13 +453,54 @@ public class BoggleGame {
             System.out.println("Saved the board: " + boardNameToSave);
         }
 
-        while(true) {
-            String input = scanner.nextLine();
-            if (input.equals("")) break;
-            for (String word: allWords.keySet()) {
-                if (word.equalsIgnoreCase(input)) {
-                    gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Human);
+
+        //asking the user if they want to rotate the grid (user story 2.4)
+        boolean rotateGrid = true;
+        BoggleGrid currentGrid = board;
+        while (rotateGrid) {
+            System.out.println("Do you want to rotate the grid? (yes/no)");
+            String rotateGridChoice = scanner.nextLine();
+            if (rotateGridChoice.equalsIgnoreCase("yes")) {
+                currentGrid = currentGrid.rotateGrid();
+                System.out.println(currentGrid);
+            }
+            else if (rotateGridChoice.equalsIgnoreCase("no")){
+                rotateGrid = false;
+                System.out.println("\nEnter the words you have found:");
+            }
+            else {
+                System.out.println("Invalid input. Please answer by \"yes\" or \"no\".");
+            }
+        }
+
+        //checks whether user has selected to use a time limit and either runs a game without the timer or with the timer
+        boolean timed = (timeLimit != 0);
+        if (!timed) {
+            while(true) {
+                String input = scanner.nextLine();
+                if (input.equals("")) break;
+                for (String word: allWords.keySet()) {
+                    if (word.equalsIgnoreCase(input)) {
+                        gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Human);
+                    }
                 }
+            }
+        }
+        else {
+            BackgroundTimer timer = new BackgroundTimer(timeLimit);
+            timer.start();
+            while(true) {
+                String input = scanner.nextLine();
+                if (!timer.isAlive()) break;
+                if (input.equals("")) break;
+                for (String word: allWords.keySet()) {
+                    if (word.equalsIgnoreCase(input)) {
+                        gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Human);
+                    }
+                }
+            }
+            if (timer.isAlive()) {
+                timer.stop();
             }
         }
     }

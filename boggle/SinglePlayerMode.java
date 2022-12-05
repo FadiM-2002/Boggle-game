@@ -20,7 +20,9 @@ public class SinglePlayerMode implements BoggleGameMode{
      */
     @Override
     public void opMove(BoggleGrid board, Map<String, ArrayList<Position>> allWords, BoggleStats gameStats,
-                       Integer difficulty) {
+                       Integer difficulty, Integer timeLimit) {
+        System.out.println("It's the computer's turn to find some words!");
+        System.out.println(board);
         double difficultyRate = difficulty * 0.01;
         int numberOfWords = (int)(difficultyRate * allWords.size());
         int counter = 0;

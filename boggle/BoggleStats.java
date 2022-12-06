@@ -119,12 +119,12 @@ public class BoggleStats {
      * Each player's score this round.
      */
     public void summarizeRound() {
-        System.out.println("Words found by user: " + playerWords);
-        System.out.println("Number of words found by user: " + playerWords.size());
-        System.out.println("User's score: " + pScore);
-        System.out.println("Words found by computer: " + computerWords);
-        System.out.println("Number of words found by computer: " + computerWords.size());
-        System.out.println("Computer's score: " + cScore);
+        System.out.println("Words found by P1: " + playerWords);
+        System.out.println("Number of words found by P1: " + playerWords.size());
+        System.out.println("P1's score: " + pScore);
+        System.out.println("Words found by P1's opponent: " + computerWords);
+        System.out.println("Number of words found by P1's opponent: " + computerWords.size());
+        System.out.println("P1 opponent's score: " + cScore);
     }
 
     /**
@@ -135,10 +135,10 @@ public class BoggleStats {
      */
     public void summarizeGame() {
         System.out.println("Number of rounds: " + round);
-        System.out.println("User's total score: " + pScoreTotal);
-        System.out.println("User's average number of words per round: " + pAverageWords);
-        System.out.println("Computer's total score: " + cScoreTotal);
-        System.out.println("Computer's average number of words per round: " + cAverageWords);
+        System.out.println("P1's total score: " + pScoreTotal);
+        System.out.println("P1's average number of words per round: " + pAverageWords);
+        System.out.println("P1 Opponent's total score: " + cScoreTotal);
+        System.out.println("P1 Opponent's average number of words per round: " + cAverageWords);
     }
 
     /**

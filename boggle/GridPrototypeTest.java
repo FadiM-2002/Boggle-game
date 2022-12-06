@@ -25,7 +25,6 @@ public class GridPrototypeTest {
             }
         }
     }
-
     //Tests the clone method with a Boggle grid of size 5
     @Test
     void TestClone2() {

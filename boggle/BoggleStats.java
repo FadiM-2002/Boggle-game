@@ -215,5 +215,4 @@ public class BoggleStats {
     public void setPlayerTime(int time) {pTime = time;}
 
     public void setOpponentTime(int time) {oTime = time;}
-
 }

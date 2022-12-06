@@ -34,4 +34,5 @@ public class SinglePlayerMode implements BoggleGameMode{
             if (counter == numberOfWords) break;
         }
     }
+
 }

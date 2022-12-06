@@ -41,7 +41,6 @@ public class GridPrototypeRegistry {
         return this.registry.containsKey(gridName);
     }
 
-
     public void printAllSavedGrids() {
         System.out.println("List of saved grids: ");
         for (String gridName : registry.keySet()) {

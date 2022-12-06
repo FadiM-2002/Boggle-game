@@ -28,7 +28,6 @@ public class BackgroundTimer extends Thread{
             }
         }
     }
-
     public Integer getTime() {
         return timeLimit;
     }

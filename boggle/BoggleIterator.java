@@ -26,4 +26,5 @@ public class BoggleIterator implements GridIterator{
         else col++;
         return position;
     }
+
 }

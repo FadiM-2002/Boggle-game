@@ -63,6 +63,5 @@ public class TwoPlayerMode implements BoggleGameMode{
                 timer.stop();
             }
         }
-
     }
 }

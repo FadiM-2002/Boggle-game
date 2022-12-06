@@ -514,6 +514,7 @@ public class BoggleGame {
     }
 }
 
+
 class WordSearchTree {
     private HashMap<String, ArrayList<Position>> root;
     private ArrayList<WordSearchTree> subtrees;

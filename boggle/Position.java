@@ -32,7 +32,6 @@ public class Position {
         this.row = row;
         this.col = col;
     }
-
    /*
      * Useful getter and setter method for class attributes
      */

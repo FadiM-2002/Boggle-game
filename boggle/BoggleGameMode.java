@@ -7,7 +7,6 @@ import java.util.Map;
  * Game mode interface
  */
 public interface BoggleGameMode {
-
     /**
      * gets words from the user's opponent, who can either be another user or the computer. If a word is valid and
      * not already in the first user's word list, then it is added to the opponent's word list and their score

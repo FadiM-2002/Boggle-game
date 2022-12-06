@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 class BoggleIteratorTest {
     @Test
     void findAllWordsTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {

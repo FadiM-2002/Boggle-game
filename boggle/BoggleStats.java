@@ -44,11 +44,43 @@ public class BoggleStats {
     /**
      * the current round being played
      */  
-    private int round; 
+    private int round;
+
+    /**
+     * the time the user played in a given round
+     */
+    private int pTime;
+
+    /**
+     * the time the opponent played in a given round
+     */
+    private int oTime;
+
+    /**
+     * the total time the user played
+     */
+    private int pTotalTime;
+
+    /**
+     * the total time the opponent played
+     */
+    private int oTotalTime;
+
+    /**
+     * the user's number of words per minute
+     */
+    private double pWordsPerMin;
+
+    /**
+     * the opponent's number of words per minute
+     */
+    private double oWordsPerMin;
 
     /**
      * enumarable types of players (human or computer)
-     */  
+     */
+
+
     public enum Player {
         Human("Human"),
         Computer("Computer");
@@ -71,6 +103,12 @@ public class BoggleStats {
         this.pScoreTotal = 0;
         this.cScore = 0;
         this.pScore = 0;
+        this.pTime = 0;
+        this.oTime = 0;
+        this.pWordsPerMin = 0;
+        this.oWordsPerMin = 0;
+        this.pTotalTime = 0;
+        this.oTotalTime = 0;
         this.computerWords = new HashSet<>();
         this.playerWords = new HashSet<>();
     }
@@ -102,8 +140,12 @@ public class BoggleStats {
      */
     public void endRound() {
         round++;
+        pTotalTime += pTime;
+        oTotalTime += oTime;
         pAverageWords = (pAverageWords * (round - 1) + playerWords.size()) / round;
         cAverageWords = (cAverageWords * (round - 1) + computerWords.size()) / round;
+        pWordsPerMin = ((pWordsPerMin * ((double) (pTotalTime - pTime) / 60)) + playerWords.size()) / ((double) pTotalTime / 60);
+        oWordsPerMin = ((oWordsPerMin * ((double) (oTotalTime - oTime) / 60)) + computerWords.size()) / ((double) oTotalTime / 60);
         playerWords.clear();
         computerWords.clear();
         pScoreTotal += pScore;
@@ -119,12 +161,14 @@ public class BoggleStats {
      * Each player's score this round.
      */
     public void summarizeRound() {
-        System.out.println("Words found by user: " + playerWords);
-        System.out.println("Number of words found by user: " + playerWords.size());
-        System.out.println("User's score: " + pScore);
-        System.out.println("Words found by computer: " + computerWords);
-        System.out.println("Number of words found by computer: " + computerWords.size());
-        System.out.println("Computer's score: " + cScore);
+        System.out.println("Words found by P1: " + playerWords);
+        System.out.println("Number of words found by P1: " + playerWords.size());
+        System.out.println("P1's score: " + pScore);
+        System.out.println("P1's time played: " + pTime);
+        System.out.println("Words found by P1's opponent: " + computerWords);
+        System.out.println("Number of words found by P1's opponent: " + computerWords.size());
+        System.out.println("P1 opponent's score: " + cScore);
+        System.out.println("P1 opponent's time played: " + oTime);
     }
 
     /**
@@ -135,10 +179,16 @@ public class BoggleStats {
      */
     public void summarizeGame() {
         System.out.println("Number of rounds: " + round);
-        System.out.println("User's total score: " + pScoreTotal);
-        System.out.println("User's average number of words per round: " + pAverageWords);
-        System.out.println("Computer's total score: " + cScoreTotal);
-        System.out.println("Computer's average number of words per round: " + cAverageWords);
+        System.out.println("P1's total score: " + pScoreTotal);
+        System.out.println("P1's average number of words per round: " + pAverageWords);
+        System.out.println("P1's total time played: " + pTotalTime);
+        System.out.println("P1's Average number of words per minute: " + pWordsPerMin);
+        System.out.println("P1 Opponent's total score: " + cScoreTotal);
+        if (cAverageWords != 0) {
+            System.out.println("P1 Opponent's average number of words per round: " + cAverageWords);
+        }
+        System.out.println("P1 opponent's total time played: " + oTotalTime);
+        System.out.println("P1 opponent's Average number of words per Min: " + oWordsPerMin);
     }
 
     /**
@@ -161,5 +211,9 @@ public class BoggleStats {
     public int getScore() {
         return this.pScore;
     }
+
+    public void setPlayerTime(int time) {pTime = time;}
+
+    public void setOpponentTime(int time) {oTime = time;}
 
 }

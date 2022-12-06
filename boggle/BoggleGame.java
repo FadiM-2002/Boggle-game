@@ -51,11 +51,6 @@ public class BoggleGame {
     private AccessibilityFeatures accessibilityFeatures;
 
     /**
-     * accessibility feature that translates grid letters to Braille
-     */
-    private AccessibilityFeatures accessibilityFeatures;
-
-    /**
      * BoggleGame constructor
      */
     public BoggleGame() throws IOException {
@@ -150,7 +145,7 @@ public class BoggleGame {
             } else {
                 timeLimit = 60;
             }
-            
+
             //checking if there are any saved grids or not (user story 2.5-ask-user-for-saving-board)
             String choiceLetters;
             boolean savedGridExist;
@@ -573,6 +568,7 @@ public class BoggleGame {
             System.out.println("It's P1's turn to find some words!");
         }
         System.out.println(translation);
+
 
         //asking the user if they want to save the current board later use, user story 2.5
         System.out.println("Do you want to save current board for later play? (yes/no)");

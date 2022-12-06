@@ -162,4 +162,12 @@ public class BoggleStats {
         return this.pScore;
     }
 
+    public int getComputerScore() {
+        return this.cScore;
+    }
+
+    public Set<String> getComputerWords() {
+        return this.computerWords;
+    }
+
 }

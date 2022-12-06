@@ -6,11 +6,12 @@ import boggle.BoggleGame;
 public class Main {
     /**
     * Main method. 
-    * param args command line arguments.
+    * @param args command line arguments.
     **/
     public static void main(String[] args) {
         BoggleGame b = new BoggleGame();
         b.giveInstructions();
         b.playGame();
     }
+
 }

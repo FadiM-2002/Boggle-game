@@ -1,14 +1,16 @@
-import boggle.BoggleView;
-import javafx.application.Application;
-import javafx.stage.Stage;
+import boggle.BoggleGame;
 
-public class Main extends Application {
-
+/**
+ * The Main class for the first Assignment in CSC207, Fall 2022
+ */
+public class Main {
+    /**
+    * Main method. 
+    * param args command line arguments.
+    **/
     public static void main(String[] args) {
-        launch(args);
-    }
-
-    public void start(Stage stage) {
-        new BoggleView(stage);
+        BoggleGame b = new BoggleGame();
+        b.giveInstructions();
+        b.playGame();
     }
 }

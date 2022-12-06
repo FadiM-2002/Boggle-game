@@ -1,5 +1,6 @@
 package boggle;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -13,7 +14,7 @@ public class BoggleGame {
     public Scanner scanner;
     /**
      * stores game statistics
-     */ 
+     */
     private BoggleStats gameStats;
     /**
      * facilitates opponent behavior during game rounds
@@ -26,13 +27,13 @@ public class BoggleGame {
 
     /**
      * dice used to randomize letter assignments for a small grid
-     */ 
-    private final String[] dice_small_grid= //dice specifications, for small and large grids
+     */
+    private final String[] dice_small_grid = //dice specifications, for small and large grids
             {"AAEEGN", "ABBJOO", "ACHOPS", "AFFKPS", "AOOTTW", "CIMOTU", "DEILRX", "DELRVY",
                     "DISTTY", "EEGHNW", "EEINSU", "EHRTVW", "EIOSST", "ELRTTY", "HIMNQU", "HLNNRZ"};
     /**
      * dice used to randomize letter assignments for a big grid
-     */ 
+     */
     private final String[] dice_big_grid =
             {"AAAFRS", "AAEEEE", "AAFIRS", "ADENNN", "AEEEEM", "AEEGMU", "AEGMNN", "AFIRSY",
                     "BJKQXZ", "CCNSTW", "CEIILT", "CEILPT", "CEIPST", "DDLNOR", "DDHNOT", "DHHLOR",
@@ -47,16 +48,16 @@ public class BoggleGame {
     /**
      * BoggleGame constructor
      */
-    public BoggleGame() {
+    public BoggleGame() throws IOException {
         this.scanner = new Scanner(System.in);
         this.gameStats = new BoggleStats();
+        this.accessibilityFeatures = new AccessibilityFeatures();
     }
 
     /**
      * Provide instructions to the user, so they know how to play the game.
      */
-    public void giveInstructions()
-    {
+    public void giveInstructions() {
         System.out.println("The Boggle board contains a grid of letters that are randomly placed.");
         System.out.println("If you are playing with me (the computer), we're both going to try to");
         System.out.println("find words in this grid by joining the letters.");
@@ -77,7 +78,7 @@ public class BoggleGame {
      * Gets information from the user to initialize a new Boggle game.
      * It will loop until the user indicates they are done playing.
      */
-    public void playGame(){
+    public void playGame() throws BrailleLetterException {
         int boardSize;
         while(true){
             System.out.println("Choose the difficulty (1-100). This will apply if you play the computer:");
@@ -92,14 +93,14 @@ public class BoggleGame {
             String choiceGrid = scanner.nextLine();
 
             //get grid size preference
-            if(choiceGrid == "") break; //end game if user inputs nothing
-            while(!choiceGrid.equals("1") && !choiceGrid.equals("2")){
+            if (choiceGrid == "") break; //end game if user inputs nothing
+            while (!choiceGrid.equals("1") && !choiceGrid.equals("2")) {
                 System.out.println("Please try again.");
                 System.out.println("Enter 1 to play on a big (5x5) grid; 2 to play on a small (4x4) one:");
                 choiceGrid = scanner.nextLine();
             }
 
-            if(choiceGrid.equals("1")) boardSize = 5;
+            if (choiceGrid.equals("1")) boardSize = 5;
             else boardSize = 4;
 
             //get game mode preference
@@ -188,7 +189,96 @@ public class BoggleGame {
                     System.out.println("Input a list of " + boardSize*boardSize + " letters:");
                     choiceLetters = scanner.nextLine();
                 }
-                playRound(boardSize,choiceLetters.toUpperCase());
+            } else { //if user cannot use saved grids (no saved grids)
+                while (!choiceLetters.equals("1") && !choiceLetters.equals("2")) {
+                    System.out.println("Please try again.");
+                    System.out.println("Enter 1 to randomly assign letters to the grid; 2 to provide your own.");
+                    choiceLetters = scanner.nextLine();
+                }
+            }
+
+            //get braille translator preference
+            System.out.println("Enter 1 to translate letters to Braille; 2 to continue without Braille.");
+            String choiceBraille = scanner.nextLine();
+
+            if (choiceBraille == "") break; //end game if user inputs nothing
+            while (!choiceBraille.equals("1") && !choiceBraille.equals("2")) {
+                System.out.println("Please try again.");
+                System.out.println("Enter 1 to translate letters to Braille; 2 to continue without Braille.");
+                choiceBraille = scanner.nextLine();
+            }
+
+            String randomized_letters = randomizeLetters(boardSize);
+
+            if (choiceBraille.equals("1")) {
+                this.accessibilityFeatures.setToggleState();
+                if (this.accessibilityFeatures.getToggleState()) {
+                    if (choiceLetters.equals("1")) {
+                        playRound(boardSize, randomized_letters, true);
+                    } else if (choiceLetters.equals("2")) {
+                        System.out.println("Input a list of " + boardSize * boardSize + " letters:");
+                        choiceLetters = scanner.nextLine();
+                        while (!(choiceLetters.length() == boardSize * boardSize)) {
+                            System.out.println("Sorry, bad input. Please try again.");
+                            System.out.println("Input a list of " + boardSize * boardSize + " letters:");
+                            choiceLetters = scanner.nextLine();
+                        }
+                        playRound(boardSize, choiceLetters.toUpperCase(), true);
+                    } else { //choiceLetters is 3
+                        this.gridRegistry.printAllSavedGrids();
+                        System.out.println("Enter the name of the saved grid to play with.");
+                        String savedGridName = scanner.nextLine();
+                        while (!this.gridRegistry.gridNameExists(savedGridName)) {
+                            System.out.println("The grid \"" + savedGridName + "\" does not exist.");
+                            System.out.println("Please try again by choosing a grid name from the list below.");
+                            this.gridRegistry.printAllSavedGrids();
+                            System.out.println("Enter the name of the saved grid to play with.");
+                            savedGridName = scanner.nextLine();
+                        }
+                        BoggleGrid selectedSavedGrid = this.gridRegistry.getGridByName(savedGridName);
+                        int gridSize = selectedSavedGrid.numCols();
+                        StringBuilder selectedGridString = new StringBuilder();
+                        for (int row = 0; row < gridSize; row++) {
+                            for (int col = 0; col < gridSize; col++) {
+                                selectedGridString.append(selectedSavedGrid.getCharAt(row, col));
+                            }
+                        }
+                        playRound(selectedSavedGrid.numCols(), selectedGridString.toString(), true);
+                    }
+                }
+            } else { //choiceBraille.equals("2")
+                if (choiceLetters.equals("1")) {
+                    playRound(boardSize, randomized_letters, false);
+                } else if (choiceLetters.equals("2")) {
+                    System.out.println("Input a list of " + boardSize * boardSize + " letters:");
+                    choiceLetters = scanner.nextLine();
+                    while (!(choiceLetters.length() == boardSize * boardSize)) {
+                        System.out.println("Sorry, bad input. Please try again.");
+                        System.out.println("Input a list of " + boardSize * boardSize + " letters:");
+                        choiceLetters = scanner.nextLine();
+                    }
+                    playRound(boardSize, choiceLetters.toUpperCase(), false);
+                } else { //choiceLetters is 3
+                    this.gridRegistry.printAllSavedGrids();
+                    System.out.println("Enter the name of the saved grid to play with.");
+                    String savedGridName = scanner.nextLine();
+                    while (!this.gridRegistry.gridNameExists(savedGridName)) {
+                        System.out.println("The grid \"" + savedGridName + "\" does not exist.");
+                        System.out.println("Please try again by choosing a grid name from the list below.");
+                        this.gridRegistry.printAllSavedGrids();
+                        System.out.println("Enter the name of the saved grid to play with.");
+                        savedGridName = scanner.nextLine();
+                    }
+                    BoggleGrid selectedSavedGrid = this.gridRegistry.getGridByName(savedGridName);
+                    int gridSize = selectedSavedGrid.numCols();
+                    StringBuilder selectedGridString = new StringBuilder();
+                    for (int row = 0; row < gridSize; row++) {
+                        for (int col = 0; col < gridSize; col++) {
+                            selectedGridString.append(selectedSavedGrid.getCharAt(row, col));
+                        }
+                    }
+                    playRound(selectedSavedGrid.numCols(), selectedGridString.toString(), false);
+                }
             }
             else { //if choiceLetters is 3
                 this.gridRegistry.printAllSavedGrids();
@@ -220,14 +310,14 @@ public class BoggleGame {
             System.out.println("Play again? Type 'Y' or 'N'");
             String choiceRepeat = scanner.nextLine().toUpperCase();
 
-            if(choiceRepeat == "") break; //end game if user inputs nothing
-            while(!choiceRepeat.equals("Y") && !choiceRepeat.equals("N")){
+            if (choiceRepeat == "") break; //end game if user inputs nothing
+            while (!choiceRepeat.equals("Y") && !choiceRepeat.equals("N")) {
                 System.out.println("Please try again.");
                 System.out.println("Play again? Type 'Y' or 'N'");
                 choiceRepeat = scanner.nextLine().toUpperCase();
             }
 
-            if(choiceRepeat == "" || choiceRepeat.equals("N")) break; //end game if user inputs nothing
+            if (choiceRepeat == "" || choiceRepeat.equals("N")) break; //end game if user inputs nothing
 
         }
 
@@ -241,8 +331,7 @@ public class BoggleGame {
             if (1 <= Integer.parseInt(difficulty) && Integer.parseInt(difficulty) <= 100) {
                 return true;
             }
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return false;
         }
         return false;
@@ -254,7 +343,7 @@ public class BoggleGame {
      * words on the board, and the set of words found by the user. These objects are
      * passed by reference from here to many other functions.
      */
-    public void playRound(int size, String letters){
+    public void playRound(int size, String letters, boolean braille) throws BrailleLetterException {
         //step 1. initialize the grid
         BoggleGrid grid = new BoggleGrid(size);
         grid.initalizeBoard(letters);
@@ -283,11 +372,11 @@ public class BoggleGame {
      * -- Assign a one of the dice to each grid position (i.e. dice_big_grid or dice_small_grid)
      * -- "Shuffle" the positions of the dice to randomize the grid positions they are assigned to
      * -- Randomly select one of the letters on the given die at each grid position to determine
-     *    the letter at the given position
+     * the letter at the given position
      *
      * @return String a String of random letters (length 16 or 25 depending on the size of the grid)
      */
-    private String randomizeLetters(int size){
+    private String randomizeLetters(int size) {
         String[] dice_grid;
         if (size == 4) dice_grid = dice_small_grid;
         else dice_grid = dice_big_grid;
@@ -295,7 +384,7 @@ public class BoggleGame {
         Collections.shuffle(strList);
         strList.toArray(dice_grid);
         String str = "";
-        for (String string: dice_grid){
+        for (String string : dice_grid) {
             int randomNumber = (int) (Math.random() * 6);
             str += string.charAt(randomNumber);
         }
@@ -316,21 +405,21 @@ public class BoggleGame {
      * ---- if your list of stored positions is >= 4, add the corresponding word to the allWords Map
      * ---- recursively search for valid, adjacent grid Positions to add to your list of stored positions.
      * ---- Note that a valid Position to add to your list will be one that is either horizontal, diagonal, or
-     *      vertically touching the current Position
+     * vertically touching the current Position
      * ---- Note also that a valid Position to add to your list will be one that, in conjunction with those
-     *      Positions that precede it, form a legal PREFIX to a word in the Dictionary (this is important!)
+     * Positions that precede it, form a legal PREFIX to a word in the Dictionary (this is important!)
      * ---- Use the "isPrefix" method in the Dictionary class to help you out here!!
      * ---- Positions that already exist in your list of stored positions will also be invalid.
      * ---- You'll be finished when you have checked EVERY possible list of Positions on the board, to see
-     *      if they can be used to form a valid word in the dictionary.
+     * if they can be used to form a valid word in the dictionary.
      * ---- Food for thought: If there are N Positions on the grid, how many possible lists of positions
-     *      might we need to evaluate?
+     * might we need to evaluate?
      *
-     * @param allWords A mutable list of all legal words that can be found, given the boggleGrid grid letters
+     * @param allWords   A mutable list of all legal words that can be found, given the boggleGrid grid letters
      * @param boggleDict A dictionary of legal words
      * @param boggleGrid A boggle grid, with a letter at each position on the grid
      */
-    private void findAllWords(Map<String,ArrayList<Position>> allWords, Dictionary boggleDict, BoggleGrid boggleGrid) {
+    private void findAllWords(Map<String, ArrayList<Position>> allWords, Dictionary boggleDict, BoggleGrid boggleGrid) {
         GridIterator iterator = boggleGrid.getIterator(); // Get the iterator to iterate over the grid
         while (iterator.hasNext()) {
             HashMap<String, ArrayList<Position>> root = new HashMap<>();
@@ -348,7 +437,8 @@ public class BoggleGame {
     /**
      * This method finds all valid words in a given tree, and adds those words to the map that contains
      * all valid words.
-     * @param map Hashmap mapping all valid words to their list of positions
+     *
+     * @param map  Hashmap mapping all valid words to their list of positions
      * @param tree A tree containing all valid prefixes of all words
      * @param dict The dictionary
      */
@@ -357,22 +447,23 @@ public class BoggleGame {
         if (key.length() > 3 && dict.containsWord(key)) {
             map.putAll(tree.getRoot());
         }
-        for (WordSearchTree subtree: tree.getSubtrees()) {
+        for (WordSearchTree subtree : tree.getSubtrees()) {
             findAllWordsHelper(map, subtree, dict);
         }
     }
 
     /**
      * Given a tree with a root node, this method builds the tree by adding valid subtrees to the tree.
-     * @param tree A WordSearchTree
-     * @param string the key of the root of the tree
+     *
+     * @param tree      A WordSearchTree
+     * @param string    the key of the root of the tree
      * @param positions the list of positions that map to each letter in the key
-     * @param grid a boggle grid
-     * @param dict the dictionary
+     * @param grid      a boggle grid
+     * @param dict      the dictionary
      */
     private void buildTree(WordSearchTree tree, String string,
-                                     ArrayList<Position> positions,
-                                     BoggleGrid grid, Dictionary dict) {
+                           ArrayList<Position> positions,
+                           BoggleGrid grid, Dictionary dict) {
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 int row = positions.get(positions.size() - 1).getRow() + i;
@@ -393,15 +484,17 @@ public class BoggleGame {
             }
         }
     }
+
     /**
      * This method returns true if the position given is not found in the list of positions, and returns
      * false otherwise.
-     * @param pos A position on the grid
+     *
+     * @param pos  A position on the grid
      * @param list A list of positions on the grid
      * @return boolean returns true if the pos is not in list
      */
     private boolean isValid(Position pos, ArrayList<Position> list) {
-        for (Position position: list) {
+        for (Position position : list) {
             if (pos.getRow() == position.getRow() && pos.getCol() == position.getCol()) {
                 return false;
             }
@@ -415,7 +508,7 @@ public class BoggleGame {
      * the player's score (in boggleStats).
      * End the turn once the user hits return (with no word).
      *
-     * @param board The boggle board
+     * @param board    The boggle board
      * @param allWords A mutable list of all legal words that can be found, given the boggleGrid grid letters
      */
     private void humanMove(BoggleGrid board, Map<String,ArrayList<Position>> allWords){
@@ -452,6 +545,14 @@ public class BoggleGame {
             this.gridRegistry.addGrid(boardNameToSave, board);
             System.out.println("Saved the board: " + boardNameToSave);
         }
+
+    private void humanMoveBraille(String translation, BoggleGrid board, Map<String, ArrayList<Position>> allWords) {
+        if (gameMode.getClass() == SinglePlayerMode.class) {
+            System.out.println("It's your turn to find some words!");
+        } else {
+            System.out.println("It's P1's turn to find some words!");
+        }
+        System.out.println(translation);
 
 
         //asking the user if they want to rotate the grid (user story 2.4)

@@ -9,5 +9,4 @@ public interface GridPrototype {
      * Clones the grid that this method is called on
      */
     public BoggleGrid clone();
-
 }

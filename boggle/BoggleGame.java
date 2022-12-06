@@ -1,5 +1,6 @@
 package boggle;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -31,11 +32,17 @@ public class BoggleGame {
                     "DHLNOR", "EIIITT", "EMOTTT", "ENSSSU", "FIPRSY", "GORRVW", "HIPRRY", "NOOTUW", "OOOTTU"};
 
     /**
+     * accessibility feature that translates grid letters to Braille
+     */
+    private AccessibilityFeatures accessibilityFeatures;
+
+    /**
      * BoggleGame constructor
      */
-    public BoggleGame() {
+    public BoggleGame() throws IOException {
         this.scanner = new Scanner(System.in);
         this.gameStats = new BoggleStats();
+        this.accessibilityFeatures = new AccessibilityFeatures();
     }
 
     /**
@@ -60,7 +67,7 @@ public class BoggleGame {
      * Gets information from the user to initialize a new Boggle game.
      * It will loop until the user indicates they are done playing.
      */
-    public void playGame(){
+    public void playGame() throws BrailleLetterException {
         int boardSize;
         while(true){
             System.out.println("Enter 1 to play on a big (5x5) grid; 2 to play on a small (4x4) one:");
@@ -88,17 +95,48 @@ public class BoggleGame {
                 choiceLetters = scanner.nextLine();
             }
 
-            if(choiceLetters.equals("1")){
-                playRound(boardSize,randomizeLetters(boardSize));
-            } else {
-                System.out.println("Input a list of " + boardSize*boardSize + " letters:");
-                choiceLetters = scanner.nextLine();
-                while(!(choiceLetters.length() == boardSize*boardSize)){
-                    System.out.println("Sorry, bad input. Please try again.");
-                    System.out.println("Input a list of " + boardSize*boardSize + " letters:");
-                    choiceLetters = scanner.nextLine();
+            //get braille translator preference
+            System.out.println("Enter 1 to translate letters to Braille; 2 to continue without Braille.");
+            String choiceBraille = scanner.nextLine();
+
+            if(choiceBraille == "") break; //end game if user inputs nothing
+            while(!choiceBraille.equals("1") && !choiceBraille.equals("2")){
+                System.out.println("Please try again.");
+                System.out.println("Enter 1 to translate letters to Braille; 2 to continue without Braille.");
+                choiceBraille = scanner.nextLine();
+            }
+
+            String randomized_letters = randomizeLetters(boardSize);
+
+            if (choiceBraille.equals("1")){
+                this.accessibilityFeatures.setToggleState();
+                if (this.accessibilityFeatures.getToggleState()){
+                    if (choiceLetters.equals("1")) {
+                        playRound(boardSize, randomized_letters, true);
+                    } else {
+                        System.out.println("Input a list of " + boardSize * boardSize + " letters:");
+                        choiceLetters = scanner.nextLine();
+                        while (!(choiceLetters.length() == boardSize * boardSize)) {
+                            System.out.println("Sorry, bad input. Please try again.");
+                            System.out.println("Input a list of " + boardSize * boardSize + " letters:");
+                            choiceLetters = scanner.nextLine();
+                        }
+                        playRound(boardSize, choiceLetters.toUpperCase(), true);
+                    }
                 }
-                playRound(boardSize,choiceLetters.toUpperCase());
+            } else {
+                if (choiceLetters.equals("1")) {
+                    playRound(boardSize, randomized_letters, false);
+                } else {
+                    System.out.println("Input a list of " + boardSize * boardSize + " letters:");
+                    choiceLetters = scanner.nextLine();
+                    while (!(choiceLetters.length() == boardSize * boardSize)) {
+                        System.out.println("Sorry, bad input. Please try again.");
+                        System.out.println("Input a list of " + boardSize * boardSize + " letters:");
+                        choiceLetters = scanner.nextLine();
+                    }
+                    playRound(boardSize, choiceLetters.toUpperCase(), false);
+                }
             }
 
             //round is over! So, store the statistics, and end the round.
@@ -131,7 +169,7 @@ public class BoggleGame {
      * words on the board, and the set of words found by the user. These objects are
      * passed by reference from here to many other functions.
      */
-    public void playRound(int size, String letters){
+    public void playRound(int size, String letters, boolean braille) throws BrailleLetterException {
         //step 1. initialize the grid
         BoggleGrid grid = new BoggleGrid(size);
         grid.initalizeBoard(letters);
@@ -141,7 +179,13 @@ public class BoggleGame {
         Map<String, ArrayList<Position>> allWords = new HashMap<String, ArrayList<Position>>();
         findAllWords(allWords, boggleDict, grid);
         //step 4. allow the user to try to find some words on the grid
-        humanMove(grid, allWords);
+        if (braille){
+            String translated_letters = this.accessibilityFeatures.translate_to_braille(letters);
+            humanMoveBraille(translated_letters, allWords);
+        }
+        else {
+            humanMove(grid, allWords);
+        }
         //step 5. allow the computer to identify remaining words
         computerMove(allWords);
     }
@@ -291,6 +335,20 @@ public class BoggleGame {
     private void humanMove(BoggleGrid board, Map<String,ArrayList<Position>> allWords){
         System.out.println("It's your turn to find some words!");
         System.out.println(board);
+        while(true) {
+            String input = scanner.nextLine();
+            if (input.equals("")) break;
+            for (String word: allWords.keySet()) {
+                if (word.equalsIgnoreCase(input)) {
+                    gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Human);
+                }
+            }
+        }
+    }
+
+    private void humanMoveBraille(String translation, Map<String,ArrayList<Position>> allWords){
+        System.out.println("It's your turn to find some words!");
+        System.out.println(translation);
         while(true) {
             String input = scanner.nextLine();
             if (input.equals("")) break;

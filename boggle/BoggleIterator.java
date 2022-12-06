@@ -4,7 +4,7 @@ package boggle;
 An iterator object that will be used to iterate through all the positions in the boggle grid
  */
 public class BoggleIterator implements GridIterator{
-    private char[][] board; // the boggle grid that will be iterated over
+    private char[][] board; // boggle grid that will be iterated over
     private int row = 0; // the row position in the grid
     private int col = 0; // the column position in the grid
     public BoggleIterator(char[][] board) {

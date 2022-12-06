@@ -1,7 +1,6 @@
 package boggle;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 import static java.lang.Character.toLowerCase;

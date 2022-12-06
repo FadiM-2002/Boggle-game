@@ -83,7 +83,7 @@ public class BoggleGame {
      * Gets information from the user to initialize a new Boggle game.
      * It will loop until the user indicates they are done playing.
      */
-    public void playGame() throws BrailleLetterException {
+    public void playGame() throws BrailleLetterException{
         int boardSize;
         while(true){
             System.out.println("Choose the difficulty (1-100). This will apply if you play the computer:");

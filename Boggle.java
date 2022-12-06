@@ -1,2 +1,2 @@
-public class Boggle{
+public class Boggle {
 }

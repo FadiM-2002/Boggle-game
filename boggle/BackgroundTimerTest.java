@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BackgroundTimerTest {
-
     @Test
     public void TimerTest() {
         BackgroundTimer timer = new BackgroundTimer(10);

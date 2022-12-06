@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.TreeSet;
-
 /**
  * The Dictionary class for the first Assignment in CSC207, Fall 2022
  * The Dictionary will contain lists of words that are acceptable for Boggle 

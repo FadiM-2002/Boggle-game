@@ -5,7 +5,6 @@ package boggle;
  * The BoggleGrid represents the grid on which we play Boggle 
  */
 public class BoggleGrid implements GridPrototype, IterableGrid{
-
     /**
      * size of grid
      */  

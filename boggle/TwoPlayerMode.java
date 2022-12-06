@@ -40,21 +40,28 @@ public class TwoPlayerMode implements BoggleGameMode{
         }
         else {
             BackgroundTimer timer = new BackgroundTimer(timeLimit);
+            int timePlayed;
             timer.start();
             while(true) {
                 String input = scanner.nextLine();
-                if (!timer.isAlive()) break;
-                if (input.equals("")) break;
+                if (!timer.isAlive()) {
+                    timePlayed = timeLimit - timer.getTime();
+                    break;
+                }
+                if (input.equals("")) {
+                    timePlayed = timeLimit - timer.getTime();
+                    break;
+                }
                 for (String word: allWords.keySet()) {
                     if (!gameStats.getPlayerWords().contains(word.toUpperCase()) && word.equalsIgnoreCase(input)) {
                         gameStats.addWord(input.toUpperCase(), BoggleStats.Player.Computer);
                     }
                 }
             }
+            gameStats.setOpponentTime(timePlayed);
             if (timer.isAlive()) {
                 timer.stop();
             }
         }
-
     }
 }

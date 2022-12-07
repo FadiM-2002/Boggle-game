@@ -64,7 +64,7 @@ public class Toggle {
      * @throws IOException if file cannot be accessed
      */
     private void initializeMap() throws IOException {
-        String filename = "brailledictionary.txt";
+        String filename = "Boggle-game/brailledictionary.txt";
         File myObj = new File(filename);
         Scanner myReader = new Scanner(myObj);
         while (myReader.hasNextLine()) {

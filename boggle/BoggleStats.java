@@ -181,14 +181,16 @@ public class BoggleStats {
         System.out.println("Number of rounds: " + round);
         System.out.println("P1's total score: " + pScoreTotal);
         System.out.println("P1's average number of words per round: " + pAverageWords);
-        System.out.println("P1's total time played: " + pTotalTime);
-        System.out.println("P1's Average number of words per minute: " + pWordsPerMin);
-        System.out.println("P1 Opponent's total score: " + cScoreTotal);
-        if (cAverageWords != 0) {
-            System.out.println("P1 Opponent's average number of words per round: " + cAverageWords);
+        if (pTotalTime != 0) {
+            System.out.println("P1's total time played: " + pTotalTime);
+            System.out.println("P1's Average number of words per minute: " + pWordsPerMin);
         }
-        System.out.println("P1 opponent's total time played: " + oTotalTime);
-        System.out.println("P1 opponent's Average number of words per Min: " + oWordsPerMin);
+        System.out.println("P1 Opponent's total score: " + cScoreTotal);
+        System.out.println("P1 Opponent's average number of words per round: " + cAverageWords);
+        if (oTotalTime != 0) {
+            System.out.println("P1 opponent's total time played: " + oTotalTime);
+            System.out.println("P1 opponent's Average number of words per Min: " + oWordsPerMin);
+        }
     }
 
     /**

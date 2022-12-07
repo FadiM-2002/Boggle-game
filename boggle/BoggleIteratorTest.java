@@ -2,6 +2,7 @@ package boggle;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -9,7 +10,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 class BoggleIteratorTest {
     @Test
-    void findAllWordsTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    void findAllWordsTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException {
         BoggleGame game = new BoggleGame();
         Method method = game.getClass().getDeclaredMethod("findAllWords", Map.class, Dictionary.class, BoggleGrid.class);
         method.setAccessible(true);

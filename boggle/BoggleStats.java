@@ -164,11 +164,15 @@ public class BoggleStats {
         System.out.println("Words found by P1: " + playerWords);
         System.out.println("Number of words found by P1: " + playerWords.size());
         System.out.println("P1's score: " + pScore);
-        System.out.println("P1's time played: " + pTime);
+        if (pTime != 0) {
+            System.out.println("P1's time played: " + pTime);
+        }
         System.out.println("Words found by P1's opponent: " + computerWords);
         System.out.println("Number of words found by P1's opponent: " + computerWords.size());
         System.out.println("P1 opponent's score: " + cScore);
-        System.out.println("P1 opponent's time played: " + oTime);
+        if (oTime != 0) {
+            System.out.println("P1 opponent's time played: " + oTime);
+        }
     }
 
     /**
